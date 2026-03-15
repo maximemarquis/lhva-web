@@ -43,7 +43,7 @@ export default async function StandingsPage() {
       <StandingsTable rows={rows} />
 
       {/* Legend */}
-      <div className="flex items-center gap-5 mt-4 text-[11px] text-dim">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-4 text-[11px] text-dim">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-0.5 bg-ice/40" />
           <span>Playoff cutoff line</span>
