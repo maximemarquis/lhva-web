@@ -108,23 +108,23 @@ function GameRow({ game }: { game: Game }) {
   )
 }
 
-// ── Filter Pill ────────────────────────────────────────────────
+// ── Filter Select ───────────────────────────────────────────────
 
-function Pill({
-  active, onClick, children, color,
-}: { active: boolean; onClick: () => void; children: React.ReactNode; color?: string }) {
+function FilterSelect({
+  label, value, onChange, children,
+}: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
   return (
-    <button
-      onClick={onClick}
-      className={`px-3 py-1.5 rounded text-[11px] font-black uppercase tracking-wider transition-all ${
-        active
-          ? 'text-white'
-          : 'bg-rink-700 text-dim hover:text-white border border-white/[0.07]'
-      }`}
-      style={active ? { background: color ?? 'rgba(255,255,255,0.15)', border: `1px solid ${color ? color + '60' : 'rgba(255,255,255,0.2)'}` } : {}}
-    >
-      {children}
-    </button>
+    <div className="flex flex-col gap-1">
+      <label className="text-[10px] font-black uppercase tracking-widest text-dim">{label}</label>
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="bg-rink-700 border border-white/[0.07] rounded text-[12px] font-bold text-white px-3 py-2 outline-none focus:border-ice/40 transition-colors cursor-pointer appearance-none pr-8"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+      >
+        {children}
+      </select>
+    </div>
   )
 }
 
@@ -141,6 +141,7 @@ export function ScheduleClient({ games, teams }: Props) {
 
   const teamFilter = searchParams.get('team') ?? ''
   const typeFilter = searchParams.get('type') ?? ''
+  const sortOrder  = searchParams.get('sort') ?? 'desc'
 
   const setParam = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -165,13 +166,14 @@ export function ScheduleClient({ games, teams }: Props) {
     return true
   })
 
-  const played   = filtered.filter(g => g.home_score !== null)
-  const upcoming = filtered.filter(g => g.home_score === null && (g as any).status !== 'live')
-  const live     = filtered.filter(g => (g as any).status === 'live')
+  const live = filtered.filter(g => (g as any).status === 'live')
+
+  // Sort (server returns desc; reverse for asc)
+  const sorted = sortOrder === 'asc' ? [...filtered].reverse() : filtered
 
   // Group by date
   const grouped: Record<string, Game[]> = {}
-  for (const game of filtered) {
+  for (const game of sorted) {
     const date = new Date(game.played_at).toLocaleDateString('en-CA', {
       weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
       timeZone: 'America/Moncton',
@@ -190,46 +192,36 @@ export function ScheduleClient({ games, teams }: Props) {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-3 mb-6">
-        {/* Team filter */}
-        <div className="flex flex-wrap gap-2">
-          <Pill active={!teamFilter} onClick={() => setParam('team', '')} >All Teams</Pill>
+      <div className="flex flex-wrap gap-4 mb-6">
+        <FilterSelect
+          label="Team"
+          value={teamFilter}
+          onChange={v => setParam('team', v)}
+        >
+          <option value="">All Teams</option>
           {activeTeams.map(t => (
-            <Pill
-              key={t.id}
-              active={teamFilter.toUpperCase() === t.abbreviation}
-              onClick={() => setParam('team', teamFilter.toUpperCase() === t.abbreviation ? '' : t.abbreviation)}
-              color={t.color}
-            >
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full inline-block" style={{ background: t.color }} />
-                {t.abbreviation}
-              </span>
-            </Pill>
+            <option key={t.id} value={t.abbreviation}>{t.name_en}</option>
           ))}
-        </div>
-        {/* Type filter */}
-        <div className="flex flex-wrap gap-2">
-          <Pill active={!typeFilter} onClick={() => setParam('type', '')}>All</Pill>
-          <Pill active={typeFilter === 'regular'} onClick={() => setParam('type', typeFilter === 'regular' ? '' : 'regular')}>Regular Season</Pill>
-          <Pill active={typeFilter === 'playoff'} onClick={() => setParam('type', typeFilter === 'playoff' ? '' : 'playoff')}>Playoffs</Pill>
-        </div>
-      </div>
+        </FilterSelect>
 
-      {/* Summary pills */}
-      <div className="flex gap-3 mb-6 flex-wrap">
-        <div className="bg-rink-800 border border-white/[0.07] rounded px-4 py-2 text-center">
-          <div className="text-xl font-black text-white">{played.length + live.length}</div>
-          <div className="text-[10px] text-dim uppercase tracking-wider">Played</div>
-        </div>
-        <div className="bg-rink-800 border border-white/[0.07] rounded px-4 py-2 text-center">
-          <div className="text-xl font-black text-ice-light">{upcoming.length}</div>
-          <div className="text-[10px] text-dim uppercase tracking-wider">Remaining</div>
-        </div>
-        <div className="bg-rink-800 border border-white/[0.07] rounded px-4 py-2 text-center">
-          <div className="text-xl font-black text-white">{filtered.length}</div>
-          <div className="text-[10px] text-dim uppercase tracking-wider">Total</div>
-        </div>
+        <FilterSelect
+          label="Type"
+          value={typeFilter}
+          onChange={v => setParam('type', v)}
+        >
+          <option value="">All Games</option>
+          <option value="regular">Regular Season</option>
+          <option value="playoff">Playoffs</option>
+        </FilterSelect>
+
+        <FilterSelect
+          label="Sort"
+          value={sortOrder}
+          onChange={v => setParam('sort', v === 'desc' ? '' : v)}
+        >
+          <option value="desc">Newest First</option>
+          <option value="asc">Oldest First</option>
+        </FilterSelect>
       </div>
 
       {/* Live */}
