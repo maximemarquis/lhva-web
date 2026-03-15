@@ -38,7 +38,12 @@ export default async function ScoresPage() {
       </div>
       <div className="text-center min-w-[80px]">
         {game.status === 'final' ? (
-          <span className="text-[15px] font-black text-white">{game.home_score} – {game.away_score}</span>
+          <div>
+            <span className="text-[15px] font-black text-white">{game.home_score} – {game.away_score}</span>
+            <div className="text-[9px] text-dim mt-0.5">
+              {new Date(game.played_at).toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Moncton' })}
+            </div>
+          </div>
         ) : game.status === 'live' ? (
           <div>
             <span className="text-[15px] font-black text-white">
