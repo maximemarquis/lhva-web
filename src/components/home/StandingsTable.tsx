@@ -19,7 +19,8 @@ export function StandingsTable({ rows }: Props) {
 
   return (
     <div className="border border-white/[0.07] rounded overflow-hidden">
-      <table className="w-full border-collapse">
+      <div className="overflow-x-auto">
+      <table className="w-full border-collapse min-w-[540px]">
         <thead>
           <tr className="bg-rink-700">
             <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-widest text-dim w-[42%]">Team</th>
@@ -65,6 +66,7 @@ export function StandingsTable({ rows }: Props) {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }

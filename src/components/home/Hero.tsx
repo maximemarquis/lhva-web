@@ -18,7 +18,7 @@ export function Hero({ recentGames }: Props) {
           <div className="text-[11px] font-black tracking-[0.14em] uppercase text-ice-light mb-3">
             2025–26 Regular Season Complete
           </div>
-          <h1 className="text-5xl font-black uppercase leading-none tracking-tight mb-2">
+          <h1 className="text-4xl sm:text-5xl font-black uppercase leading-none tracking-tight mb-2">
             LHVA<br />
             <span className="text-ice-light">Playoffs</span><br />
             2026
