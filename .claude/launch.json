@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "lhva-web (dev)",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd \"/Users/marquism/Desktop/lvha project/lhva-web/.claude/worktrees/interesting-heyrovsky\" && source ~/.nvm/nvm.sh && npm install --prefer-offline 2>/dev/null; npm run dev"],
+      "port": 3000
+    }
+  ]
+}
