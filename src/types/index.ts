@@ -4,6 +4,22 @@ export type ArticleStatus = 'draft' | 'published' | 'scheduled' | 'archived'
 export type ArticleCategory = 'playoffs' | 'players' | 'awards' | 'league' | 'recap' | 'general'
 export type PlayerPosition = 'F' | 'D' | 'G'
 export type AdminRole = 'commissioner' | 'team_rep' | 'scorekeeper' | 'readonly'
+export type Shoots = 'L' | 'R'
+export type GoalieDecision = 'W' | 'L' | 'OTW' | 'OTL' | 'SOW' | 'SOL' | 'ND'
+
+export type LineupRole =
+  | 'F1L' | 'F1C' | 'F1R'
+  | 'F2L' | 'F2C' | 'F2R'
+  | 'F3L' | 'F3C' | 'F3R'
+  | 'F4L' | 'F4C' | 'F4R'
+  | 'D1L' | 'D1R'
+  | 'D2L' | 'D2R'
+  | 'D3L' | 'D3R'
+  | 'G1'  | 'G2'
+  | 'scratch' | 'healthy_scratch'
+
+export type StaffRole =
+  | 'head_coach' | 'assistant_coach' | 'goalie_coach' | 'trainer' | 'manager'
 
 export interface Season {
   id: number
@@ -32,6 +48,15 @@ export interface Player {
   jersey_number: number | null
   position: PlayerPosition
   is_active: boolean
+  slug: string | null
+  photo_url: string | null
+  date_of_birth: string | null
+  hometown: string | null
+  height_cm: number | null
+  weight_lbs: number | null
+  shoots: Shoots | null
+  catches: Shoots | null
+  bio: string | null
   team?: Team
 }
 
@@ -64,6 +89,45 @@ export interface Penalty {
   team?: Team
 }
 
+export interface GameLineup {
+  id: number
+  game_id: number
+  player_id: number
+  role: LineupRole
+  team_id: number
+  player?: Player
+}
+
+export interface GameStaff {
+  id: number
+  game_id: number
+  team_id: number
+  name: string
+  role: StaffRole
+}
+
+export interface GoalieStat {
+  id: number
+  game_id: number
+  player_id: number
+  team_id: number
+  shots_against: number
+  saves: number
+  goals_against: number
+  toi_minutes: number | null
+  decision: GoalieDecision | null
+  shutout: boolean
+  player?: Player
+}
+
+export interface GamePPStat {
+  id: number
+  game_id: number
+  team_id: number
+  pp_opportunities: number
+  pp_goals: number
+}
+
 export interface Game {
   id: number
   season_id: number
@@ -82,6 +146,10 @@ export interface Game {
   away_team?: Team
   goals?: Goal[]
   penalties?: Penalty[]
+  lineup?: GameLineup[]
+  staff?: GameStaff[]
+  goalie_stats?: GoalieStat[]
+  pp_stats?: GamePPStat[]
 }
 
 export interface StandingRow {
@@ -123,6 +191,22 @@ export interface PlayerStat {
   player_id: number
   player: Player
   games_played: number
+  goals: number
+  assists: number
+  points: number
+  pim: number
+}
+
+export interface PlayerCareerStat {
+  player_id: number
+  season_id: number
+  season_label: string
+  team_id: number
+  team_name: string
+  team_abbr: string
+  team_color: string
+  game_type: GameType
+  gp: number
   goals: number
   assists: number
   points: number

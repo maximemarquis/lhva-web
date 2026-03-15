@@ -2,40 +2,87 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import type { AdminRole } from '@/types'
 
-const NAV = [
-  { section: 'Overview',        items: [
-    { label: 'Dashboard',   href: '/admin' },
+// ── Nav config ─────────────────────────────────────────────
+const COMMISSIONER_NAV = [
+  { section: 'Overview', items: [
+    { label: 'Dashboard',    href: '/admin' },
+    { label: 'Activity Log', href: '/admin/activity' },
   ]},
   { section: 'Game Management', items: [
-    { label: 'Enter Score', href: '/admin/scores' },
-    { label: 'Schedule',    href: '/admin/schedule' },
-    { label: 'Playoffs',    href: '/admin/playoffs' },
+    { label: 'Scores',       href: '/admin/scores' },
+    { label: 'Schedule',     href: '/admin/schedule' },
+    { label: 'Playoffs',     href: '/admin/playoffs' },
   ]},
-  { section: 'League Data',     items: [
-    { label: 'Standings',   href: '/admin/standings' },
-    { label: 'Player Stats',href: '/admin/stats' },
-    { label: 'Rosters',     href: '/admin/rosters' },
-    { label: 'Teams',       href: '/admin/teams' },
+  { section: 'League Data', items: [
+    { label: 'Standings',    href: '/admin/standings' },
+    { label: 'Player Stats', href: '/admin/stats' },
+    { label: 'Rosters',      href: '/admin/rosters' },
+    { label: 'Teams',        href: '/admin/teams' },
   ]},
-  { section: 'Content',         items: [
-    { label: 'Articles',    href: '/admin/articles' },
-    { label: 'Awards',      href: '/admin/awards' },
+  { section: 'Content', items: [
+    { label: 'Articles',     href: '/admin/articles' },
+    { label: 'Awards',       href: '/admin/awards' },
   ]},
-  { section: 'Settings',        items: [
-    { label: 'Season Config',href: '/admin/settings' },
-    { label: 'Users & Roles',href: '/admin/users' },
+  { section: 'Settings', items: [
+    { label: 'Season Config', href: '/admin/settings' },
+    { label: 'Users & Roles', href: '/admin/users' },
   ]},
 ]
 
-interface Props {
-  userEmail: string
+const SCOREKEEPER_NAV = [
+  { section: 'Game Day', items: [
+    { label: 'Games',        href: '/admin/scores' },
+  ]},
+  { section: 'League', items: [
+    { label: 'Standings',    href: '/admin/standings' },
+    { label: 'Player Stats', href: '/admin/stats' },
+  ]},
+]
+
+const TEAM_REP_NAV = [
+  { section: 'My Team', items: [
+    { label: 'Roster',       href: '/admin/rosters' },
+  ]},
+  { section: 'League', items: [
+    { label: 'Standings',    href: '/admin/standings' },
+    { label: 'Schedule',     href: '/admin/schedule' },
+    { label: 'Player Stats', href: '/admin/stats' },
+  ]},
+]
+
+const ROLE_LABEL: Record<string, string> = {
+  commissioner: 'Commissioner',
+  scorekeeper:  'Scorekeeper',
+  team_rep:     'Team Rep',
+  readonly:     'Read Only',
 }
 
-export function AdminSidebar({ userEmail }: Props) {
+const ROLE_COLOR: Record<string, string> = {
+  commissioner: 'bg-amber-500/15 text-amber-400',
+  scorekeeper:  'bg-ice/15 text-ice-light',
+  team_rep:     'bg-green-500/15 text-green-400',
+  readonly:     'bg-white/5 text-dim',
+}
+
+// ── Component ──────────────────────────────────────────────
+interface Props {
+  userEmail: string
+  userName?: string
+  role: string
+}
+
+export function AdminSidebar({ userEmail, userName, role }: Props) {
   const pathname = usePathname()
-  const router = useRouter()
+  const router   = useRouter()
   const supabase = createClient()
+
+  const nav = role === 'commissioner' || role === 'readonly'
+    ? COMMISSIONER_NAV
+    : role === 'team_rep'
+    ? TEAM_REP_NAV
+    : SCOREKEEPER_NAV
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -43,7 +90,8 @@ export function AdminSidebar({ userEmail }: Props) {
     router.refresh()
   }
 
-  const initials = userEmail.slice(0, 2).toUpperCase()
+  const initials = (userName ?? userEmail).slice(0, 2).toUpperCase()
+  const displayName = userName ?? userEmail
 
   return (
     <div className="w-56 bg-rink-800 border-r border-white/[0.07] flex flex-col shrink-0 min-h-screen">
@@ -62,15 +110,23 @@ export function AdminSidebar({ userEmail }: Props) {
         </div>
       </div>
 
+      {/* Role badge */}
+      <div className="px-4 py-2 border-b border-white/[0.07]">
+        <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-sm ${ROLE_COLOR[role] ?? ROLE_COLOR.readonly}`}>
+          {ROLE_LABEL[role] ?? role}
+        </span>
+      </div>
+
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto">
-        {NAV.map(group => (
+        {nav.map(group => (
           <div key={group.section} className="mb-1">
             <div className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.14em] text-dim">
               {group.section}
             </div>
             {group.items.map(item => {
-              const active = pathname === item.href
+              const active = pathname === item.href ||
+                (item.href !== '/admin' && pathname.startsWith(item.href))
               return (
                 <Link key={item.href} href={item.href}
                   className={`flex items-center gap-2 mx-2 px-3 py-2 rounded text-[12px] font-medium transition-colors ${
@@ -86,6 +142,16 @@ export function AdminSidebar({ userEmail }: Props) {
         ))}
       </nav>
 
+      {/* Scorekeeper game day shortcut */}
+      {role === 'scorekeeper' && (
+        <div className="px-3 py-3 border-t border-white/[0.07]">
+          <Link href="/admin/scores"
+            className="flex items-center justify-center gap-2 w-full bg-green-500/15 hover:bg-green-500/25 text-green-400 border border-green-500/30 rounded-lg py-2.5 text-[12px] font-black transition-colors">
+            🏒 Game Day
+          </Link>
+        </div>
+      )}
+
       {/* User footer */}
       <div className="border-t border-white/[0.07] p-3">
         <div className="flex items-center gap-2.5 mb-2">
@@ -93,8 +159,8 @@ export function AdminSidebar({ userEmail }: Props) {
             {initials}
           </div>
           <div className="min-w-0">
-            <div className="text-[12px] font-semibold truncate">{userEmail}</div>
-            <div className="text-[10px] text-muted">Administrator</div>
+            <div className="text-[12px] font-semibold truncate">{displayName}</div>
+            <div className="text-[10px] text-muted truncate">{userName ? userEmail : ''}</div>
           </div>
         </div>
         <button onClick={handleSignOut}

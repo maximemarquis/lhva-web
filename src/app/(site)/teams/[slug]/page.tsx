@@ -91,21 +91,23 @@ export default async function TeamPage({ params }: Props) {
               <tbody>
                 {group.players.map(player => (
                   <tr key={player.id}
-                    className="border-t border-white/[0.04] hover:bg-white/[0.02] transition-colors">
+                    className="border-t border-white/[0.04] hover:bg-white/[0.02] transition-colors cursor-pointer">
                     <td className="px-4 py-2.5">
                       <span className="text-[13px] font-black text-white">
                         {player.jersey_number ?? '—'}
                       </span>
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className="text-[13px] font-semibold text-white">
+                      <a href={`/players/${player.slug ?? player.id}`}
+                        className="text-[13px] font-semibold text-white hover:text-ice-light transition-colors">
                         {player.first_name} {player.last_name}
-                      </span>
+                      </a>
                     </td>
-                    <td className="px-4 py-2.5 text-center">
-                      <span className="text-[11px] font-bold text-muted uppercase tracking-wide">
-                        {POSITION_LABEL[player.position] ?? player.position}
-                      </span>
+                    <td className="px-4 py-2.5 text-right">
+                      <a href={`/players/${player.slug ?? player.id}`}
+                        className="text-[11px] font-bold text-dim hover:text-ice-light transition-colors uppercase tracking-wider">
+                        {POSITION_LABEL[player.position] ?? player.position} →
+                      </a>
                     </td>
                   </tr>
                 ))}

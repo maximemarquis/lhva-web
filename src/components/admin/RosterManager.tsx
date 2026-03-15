@@ -1,5 +1,7 @@
 'use client'
 
+import { PlayerPhotoUpload } from '@/components/admin/PlayerPhotoUpload'
+
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -214,12 +216,29 @@ export function RosterManager({ teams, playersByTeam }: Props) {
               <div key={player.id}
                 className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
                 <div className="flex items-center gap-3">
-                  <span className="text-[13px] font-black text-white w-8 text-right">
-                    {player.jersey_number ?? '—'}
-                  </span>
-                  <span className="text-[13px] font-semibold text-white">
-                    {player.first_name} {player.last_name}
-                  </span>
+                  <PlayerPhotoUpload
+                    playerId={player.id}
+                    playerSlug={player.slug}
+                    currentPhotoUrl={player.photo_url}
+                    playerName={`${player.first_name} ${player.last_name}`}
+                    teamColor={teams.find(t => t.id === activeTeam)?.color ?? '#0088ce'}
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[13px] font-black text-white w-8 text-right">
+                        {player.jersey_number ?? '—'}
+                      </span>
+                      <span className="text-[13px] font-semibold text-white">
+                        {player.first_name} {player.last_name}
+                      </span>
+                    </div>
+                    {player.slug && (
+                      <a href={`/players/${player.slug}`} target="_blank"
+                        className="text-[10px] text-dim hover:text-ice-light transition-colors ml-10">
+                        View profile ↗
+                      </a>
+                    )}
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => openEdit(player)}

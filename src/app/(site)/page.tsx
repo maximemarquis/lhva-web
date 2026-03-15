@@ -4,10 +4,10 @@ import { StandingsTable } from '@/components/home/StandingsTable'
 import { LeagueLeaders } from '@/components/home/LeagueLeaders'
 import { UpcomingGames } from '@/components/home/UpcomingGames'
 import { NewsFeed } from '@/components/home/NewsFeed'
+import { LiveBanner } from '@/components/home/LiveBanner'
 import type { StandingRow, Game, Article } from '@/types'
 
-// Revalidate every 5 minutes
-export const revalidate = 300
+export const revalidate = 30
 
 function SectionHeader({ title, href }: { title: string; href: string }) {
   return (
@@ -26,14 +26,12 @@ function SectionHeader({ title, href }: { title: string; href: string }) {
 export default async function HomePage() {
   const supabase = await createServerSupabaseClient()
 
-  // Fetch all data in parallel
-  const [standingsRes, recentGamesRes, upcomingGamesRes, articlesRes] = await Promise.all([
+  const [standingsRes, recentGamesRes, upcomingGamesRes, articlesRes, liveGamesRes] = await Promise.all([
     supabase
       .from('standings')
       .select('*')
       .eq('season_id', 1)
       .order('pts', { ascending: false }),
-
     supabase
       .from('games')
       .select(`*, home_team:teams!home_team_id(*), away_team:teams!away_team_id(*)`)
@@ -41,7 +39,6 @@ export default async function HomePage() {
       .not('home_score', 'is', null)
       .order('played_at', { ascending: false })
       .limit(3),
-
     supabase
       .from('games')
       .select(`*, home_team:teams!home_team_id(*), away_team:teams!away_team_id(*)`)
@@ -49,7 +46,6 @@ export default async function HomePage() {
       .gte('played_at', new Date().toISOString())
       .order('played_at', { ascending: true })
       .limit(4),
-
     supabase
       .from('articles')
       .select('*, team:teams(name_en, abbreviation, color)')
@@ -57,16 +53,28 @@ export default async function HomePage() {
       .lte('published_at', new Date().toISOString())
       .order('published_at', { ascending: false })
       .limit(4),
+    supabase
+      .from('games')
+      .select(`
+        *,
+        home_team:teams!home_team_id(*),
+        away_team:teams!away_team_id(*),
+        goals(*, scorer:players!scorer_id(id, first_name, last_name)),
+        penalties(*, player:players(id, first_name, last_name, jersey_number))
+      `)
+      .eq('status', 'live')
+      .limit(3),
   ])
 
-  // Use live data if available, otherwise components fall back to hardcoded data
-  const standings = (standingsRes.data ?? []) as StandingRow[]
-  const recentGames = (recentGamesRes.data ?? []) as Game[]
+  const standings    = (standingsRes.data ?? []) as StandingRow[]
+  const recentGames  = (recentGamesRes.data ?? []) as Game[]
   const upcomingGames = (upcomingGamesRes.data ?? []) as Game[]
-  const articles = (articlesRes.data ?? []) as Article[]
+  const articles     = (articlesRes.data ?? []) as Article[]
+  const liveGames    = (liveGamesRes.data ?? []) as any[]
 
   return (
     <>
+      {liveGames.length > 0 && <LiveBanner games={liveGames} />}
       <Hero recentGames={recentGames} />
 
       <div className="max-w-[1200px] mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
