@@ -1,6 +1,6 @@
 export function TopBar() {
   return (
-    <div className="bg-rink-800 border-b border-white/[0.07] h-9 flex items-center justify-between px-6">
+    <div className="hidden sm:flex bg-rink-800 border-b border-white/[0.07] h-9 items-center justify-between px-6">
       <div className="flex gap-5">
         {['Season 2025–26', 'Awards', 'History', 'Contact'].map(label => (
           <a key={label} href="#"
