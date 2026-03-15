@@ -282,7 +282,7 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
     <div className="bg-rink-800 border border-white/[0.07] rounded-lg overflow-hidden">
 
       {/* Team + Score header */}
-      <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-end p-5">
+      <div className="grid grid-cols-[1fr_auto_1fr] gap-2 md:gap-4 items-end p-3 md:p-5">
         <div className="flex flex-col gap-1.5">
           <label className="text-[10px] font-black uppercase tracking-widest text-dim">Home Team</label>
           <select value={homeTeamId} onChange={e => setHomeTeamId(Number(e.target.value))} className={selectCls}>
@@ -308,7 +308,7 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
       </div>
 
       {/* Meta row */}
-      <div className="grid grid-cols-4 gap-3 px-5 pb-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 px-3 md:px-5 pb-4">
         <div className="flex flex-col gap-1.5">
           <label className="text-[10px] font-black uppercase tracking-widest text-dim">Date & Time</label>
           <input type="datetime-local" value={playedAt} onChange={e => setPlayedAt(e.target.value)} className={inputCls} />
@@ -338,7 +338,7 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-t border-b border-white/[0.07] bg-rink-700">
+      <div className="flex overflow-x-auto border-t border-b border-white/[0.07] bg-rink-700 scrollbar-none">
         {TABS.map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={cls(
@@ -365,7 +365,8 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
             </div>
           )}
           {goals.map((g, i) => (
-            <div key={i} className="grid grid-cols-[82px_1fr_1fr_1fr_1fr_68px_28px] gap-2 items-center bg-rink-700 rounded px-3 py-2">
+            <div key={i} className="overflow-x-auto">
+            <div className="grid grid-cols-[82px_1fr_1fr_1fr_1fr_68px_28px] gap-2 items-center bg-rink-700 rounded px-3 py-2 min-w-[560px]">
               <div className="flex gap-1">
                 <input type="text" value={g.period} placeholder="Per." onChange={e => updateGoal(i, { period: e.target.value })}
                   className="w-8 bg-rink-600 border border-white/10 rounded text-white text-xs px-1.5 py-1.5 text-center outline-none" />
@@ -401,6 +402,7 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
               <button onClick={() => setGoals(g => g.filter((_, idx) => idx !== i))}
                 className="text-dim hover:text-red-400 border border-white/10 rounded px-1.5 py-1.5 text-sm transition-colors">✕</button>
             </div>
+            </div>
           ))}
           <button onClick={() => setGoals(g => [...g, { period: '1', time_in_period: '', team_id: homeTeamId, scorer_id: null, assist1_id: null, assist2_id: null, goal_type: 'ev' }])}
             className="w-full text-[11px] font-black uppercase tracking-wider text-muted border border-dashed border-white/10 rounded py-2 hover:bg-white/[0.03] hover:text-white transition-colors">
@@ -421,7 +423,8 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
             <div className="text-[12px] text-dim text-center py-4 border border-dashed border-white/10 rounded">No penalties entered</div>
           )}
           {penalties.map((p, i) => (
-            <div key={i} className="grid grid-cols-[82px_90px_1fr_1fr_60px_28px] gap-2 items-center bg-rink-700 rounded px-3 py-2">
+            <div key={i} className="overflow-x-auto">
+            <div className="grid grid-cols-[82px_90px_1fr_1fr_60px_28px] gap-2 items-center bg-rink-700 rounded px-3 py-2 min-w-[500px]">
               <div className="flex gap-1">
                 <input type="text" value={p.period} placeholder="Per." onChange={e => updatePenalty(i, { period: e.target.value })}
                   className="w-8 bg-rink-600 border border-white/10 rounded text-white text-xs px-1.5 py-1.5 text-center outline-none" />
@@ -453,6 +456,7 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
               <button onClick={() => setPenalties(p => p.filter((_, idx) => idx !== i))}
                 className="text-dim hover:text-red-400 border border-white/10 rounded px-1.5 py-1.5 text-sm transition-colors">✕</button>
             </div>
+            </div>
           ))}
           <button onClick={() => setPenalties(p => [...p, { period: '1', time_in_period: '', team_id: homeTeamId, player_id: null, infraction: '', minutes: '2' }])}
             className="w-full text-[11px] font-black uppercase tracking-wider text-muted border border-dashed border-white/10 rounded py-2 hover:bg-white/[0.03] hover:text-white transition-colors">
@@ -463,7 +467,7 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
 
       {/* ── LINEUP TAB ── */}
       {tab === 'Lineup' && (
-        <div className="p-4 grid grid-cols-2 gap-6">
+        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
           {[{ teamId: homeTeamId, lineup: homeLineup, setLineup: setHomeLineup, scratches: homeScratches, setScratches: setHomeScratches },
             { teamId: awayTeamId, lineup: awayLineup, setLineup: setAwayLineup, scratches: awayScratches, setScratches: setAwayScratches }
           ].map(({ teamId, lineup, setLineup, scratches, setScratches }) => (
@@ -554,7 +558,7 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
 
       {/* ── GOALIES TAB ── */}
       {tab === 'Goalies' && (
-        <div className="p-4 grid grid-cols-2 gap-5">
+        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-5">
           {goalieStats.map((g, i) => (
             <div key={i} className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
@@ -607,7 +611,7 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
 
       {/* ── PP STATS TAB ── */}
       {tab === 'PP Stats' && (
-        <div className="p-4 grid grid-cols-2 gap-5">
+        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-5">
           {ppStats.map((p, i) => (
             <div key={i} className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
@@ -644,7 +648,8 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
             <div className="text-[12px] text-dim text-center py-4 border border-dashed border-white/10 rounded">No staff entered</div>
           )}
           {staff.map((s, i) => (
-            <div key={i} className="grid grid-cols-[120px_1fr_1fr_28px] gap-2 items-center bg-rink-700 rounded px-3 py-2">
+            <div key={i} className="overflow-x-auto">
+            <div className="grid grid-cols-[120px_1fr_1fr_28px] gap-2 items-center bg-rink-700 rounded px-3 py-2 min-w-[380px]">
               <select value={s.team_id} onChange={e => setStaff(st => st.map((x, idx) => idx === i ? { ...x, team_id: Number(e.target.value) } : x))}
                 className="bg-rink-600 border border-white/10 rounded text-white text-xs px-2 py-1.5">
                 {[homeTeamId, awayTeamId].map(tid => {
@@ -661,6 +666,7 @@ export function ScoreEntryForm({ teams, playersByTeam, gameId }: Props) {
               </select>
               <button onClick={() => setStaff(st => st.filter((_, idx) => idx !== i))}
                 className="text-dim hover:text-red-400 border border-white/10 rounded px-1.5 py-1.5 text-sm transition-colors">✕</button>
+            </div>
             </div>
           ))}
           <button onClick={() => setStaff(s => [...s, { team_id: homeTeamId, name: '', role: 'head_coach' }])}

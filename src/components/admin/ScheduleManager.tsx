@@ -133,7 +133,7 @@ export function ScheduleManager({ teams, initialGames }: Props) {
       {showForm && (
         <div className="bg-rink-800 border border-ice/30 rounded-lg p-5 flex flex-col gap-4">
           <div className="text-[11px] font-black uppercase tracking-widest text-ice-light">New Game</div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
               <label className="text-[10px] font-black uppercase tracking-widest text-dim">Home Team</label>
               <select value={form.home_team_id} onChange={e => setForm(f => ({ ...f, home_team_id: Number(e.target.value) }))}
@@ -190,62 +190,68 @@ export function ScheduleManager({ teams, initialGames }: Props) {
             <div className="bg-rink-800 border border-white/[0.07] rounded-lg overflow-hidden">
               {monthGames.map(game => (
                 <div key={game.id}
-                  className="grid grid-cols-[1fr_auto_1fr_auto_auto_auto] items-center gap-4 px-4 py-3 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
+                  className="flex flex-col sm:grid sm:grid-cols-[1fr_auto_1fr_auto_auto_auto] sm:items-center sm:gap-4 px-4 py-3 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors gap-2">
 
-                  {/* Home */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black text-white shrink-0"
-                      style={{ background: game.home_team?.color ?? '#333' }}>
-                      {game.home_team?.abbreviation}
+                  {/* Mobile: teams + score row */}
+                  <div className="flex items-center gap-2 sm:contents">
+                    {/* Home */}
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black text-white shrink-0"
+                        style={{ background: game.home_team?.color ?? '#333' }}>
+                        {game.home_team?.abbreviation}
+                      </div>
+                      <span className="text-[13px] font-semibold text-white truncate">{game.home_team?.name_en}</span>
                     </div>
-                    <span className="text-[13px] font-semibold text-white truncate">{game.home_team?.name_en}</span>
+
+                    {/* Score or time */}
+                    <div className="text-center min-w-[80px] shrink-0">
+                      {game.home_score !== null ? (
+                        <span className="text-[14px] font-black text-white">
+                          {game.home_score} – {game.away_score}
+                        </span>
+                      ) : (
+                        <span className="text-[12px] font-bold text-ice-light">
+                          {new Date(game.played_at).toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}
+                        </span>
+                      )}
+                      <div className="text-[9px] text-dim uppercase tracking-wider">
+                        {new Date(game.played_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}
+                      </div>
+                    </div>
+
+                    {/* Away */}
+                    <div className="flex items-center gap-2 justify-end flex-1 min-w-0">
+                      <span className="text-[13px] font-semibold text-white truncate">{game.away_team?.name_en}</span>
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black text-white shrink-0"
+                        style={{ background: game.away_team?.color ?? '#333' }}>
+                        {game.away_team?.abbreviation}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Score or time */}
-                  <div className="text-center min-w-[80px]">
-                    {game.home_score !== null ? (
-                      <span className="text-[14px] font-black text-white">
-                        {game.home_score} – {game.away_score}
-                      </span>
-                    ) : (
-                      <span className="text-[12px] font-bold text-ice-light">
-                        {new Date(game.played_at).toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}
-                      </span>
-                    )}
-                    <div className="text-[9px] text-dim uppercase tracking-wider">
-                      {new Date(game.played_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}
-                    </div>
+                  {/* Actions row (mobile: full width; desktop: inline) */}
+                  <div className="flex items-center gap-2 sm:contents">
+                    {/* Type badge */}
+                    <span className="text-[10px] font-bold text-dim uppercase tracking-wider whitespace-nowrap hidden lg:block">
+                      {GAME_TYPE_LABEL[game.game_type] ?? game.game_type}
+                    </span>
+
+                    {/* Publish toggle */}
+                    <button onClick={() => togglePublish(game)}
+                      className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-sm border transition-colors whitespace-nowrap ${
+                        game.is_published
+                          ? 'bg-ice/10 text-ice-light border-ice/20 hover:bg-red-500/10 hover:text-red-400 hover:border-red-400/20'
+                          : 'bg-white/5 text-dim border-white/10 hover:bg-ice/10 hover:text-ice-light hover:border-ice/20'
+                      }`}>
+                      {game.is_published ? 'Published' : 'Draft'}
+                    </button>
+
+                    {/* Delete */}
+                    <button onClick={() => handleDelete(game)} disabled={deleting === game.id}
+                      className="text-[11px] font-bold text-dim hover:text-red-400 border border-white/10 hover:border-red-400/20 rounded px-2.5 py-1 transition-colors disabled:opacity-50">
+                      {deleting === game.id ? '…' : 'Del'}
+                    </button>
                   </div>
-
-                  {/* Away */}
-                  <div className="flex items-center gap-2 justify-end">
-                    <span className="text-[13px] font-semibold text-white truncate">{game.away_team?.name_en}</span>
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black text-white shrink-0"
-                      style={{ background: game.away_team?.color ?? '#333' }}>
-                      {game.away_team?.abbreviation}
-                    </div>
-                  </div>
-
-                  {/* Type badge */}
-                  <span className="text-[10px] font-bold text-dim uppercase tracking-wider whitespace-nowrap hidden lg:block">
-                    {GAME_TYPE_LABEL[game.game_type] ?? game.game_type}
-                  </span>
-
-                  {/* Publish toggle */}
-                  <button onClick={() => togglePublish(game)}
-                    className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-sm border transition-colors whitespace-nowrap ${
-                      game.is_published
-                        ? 'bg-ice/10 text-ice-light border-ice/20 hover:bg-red-500/10 hover:text-red-400 hover:border-red-400/20'
-                        : 'bg-white/5 text-dim border-white/10 hover:bg-ice/10 hover:text-ice-light hover:border-ice/20'
-                    }`}>
-                    {game.is_published ? 'Published' : 'Draft'}
-                  </button>
-
-                  {/* Delete */}
-                  <button onClick={() => handleDelete(game)} disabled={deleting === game.id}
-                    className="text-[11px] font-bold text-dim hover:text-red-400 border border-white/10 hover:border-red-400/20 rounded px-2.5 py-1 transition-colors disabled:opacity-50">
-                    {deleting === game.id ? '…' : 'Del'}
-                  </button>
 
                 </div>
               ))}
