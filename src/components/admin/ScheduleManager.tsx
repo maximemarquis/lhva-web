@@ -44,8 +44,8 @@ export function ScheduleManager({ teams, initialGames }: Props) {
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'played'>('all')
 
   const filtered = games.filter(g => {
-    if (filter === 'upcoming') return g.home_score === null
-    if (filter === 'played')   return g.home_score !== null
+    if (filter === 'upcoming') return new Date(g.played_at) >= new Date()
+    if (filter === 'played')   return new Date(g.played_at) < new Date()
     return true
   })
 

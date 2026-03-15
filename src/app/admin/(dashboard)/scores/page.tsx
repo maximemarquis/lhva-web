@@ -13,9 +13,11 @@ export default async function ScoresPage() {
 
   const games = (data ?? []) as Game[]
 
-  const upcoming = games.filter(g => g.home_score === null && (g as any).status !== 'final')
-  const recent   = games.filter(g => (g as any).status === 'final').slice(0, 10)
+  const now      = new Date().toISOString()
   const live     = games.filter(g => (g as any).status === 'live')
+  const upcoming = games.filter(g => g.home_score === null && g.played_at > now && (g as any).status !== 'live')
+  const unscored = games.filter(g => g.home_score === null && g.played_at <= now && (g as any).status !== 'live')
+  const recent   = games.filter(g => g.home_score !== null).slice(0, 10)
 
   const statusBadge = (game: any) => {
     const styles: Record<string, string> = {
@@ -48,11 +50,11 @@ export default async function ScoresPage() {
           </div>
         ) : (
           <span className="text-[12px] font-bold text-ice-light">
-            {new Date(game.played_at).toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}
+            {new Date(game.played_at).toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Moncton' })}
           </span>
         )}
         <div className="text-[9px] text-dim">
-          {new Date(game.played_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}
+          {new Date(game.played_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', timeZone: 'America/Moncton' })}
         </div>
       </div>
       <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
@@ -88,6 +90,15 @@ export default async function ScoresPage() {
           </div>
           <div className="bg-rink-800 border border-green-500/20 rounded-lg overflow-hidden">
             {live.map(g => <GameRow key={g.id} game={g} />)}
+          </div>
+        </div>
+      )}
+
+      {unscored.length > 0 && (
+        <div>
+          <div className="text-[11px] font-black uppercase tracking-widest text-amber-400 mb-2">⚠ Score Pending</div>
+          <div className="bg-rink-800 border border-amber-500/20 rounded-lg overflow-hidden">
+            {unscored.map(g => <GameRow key={g.id} game={g} />)}
           </div>
         </div>
       )}
