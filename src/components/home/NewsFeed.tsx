@@ -24,14 +24,28 @@ export function NewsFeed({ articles }: Props) {
         {articles.map(article => (
           <a key={article.id} href={`/news/${article.slug}`}
             className="flex items-start gap-3 px-4 py-3 border-b border-white/[0.07] last:border-0 hover:bg-white/[0.02] transition-colors group">
-            <div className="w-9 h-9 bg-rink-700 rounded flex items-center justify-center text-base shrink-0">
-              {CATEGORY_EMOJI[article.category] ?? '📣'}
-            </div>
-            <div>
+
+            {/* Thumbnail or emoji icon */}
+            {article.cover_image_url ? (
+              <div className="w-12 h-10 rounded overflow-hidden shrink-0">
+                <img
+                  src={article.cover_image_url}
+                  alt=""
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+              </div>
+            ) : (
+              <div className="w-9 h-9 bg-rink-700 rounded flex items-center justify-center text-base shrink-0">
+                {CATEGORY_EMOJI[article.category] ?? '📣'}
+              </div>
+            )}
+
+            <div className="min-w-0">
               <div className="text-[10px] font-black uppercase tracking-wider text-ice-light mb-1">
                 {article.category}
               </div>
-              <div className="text-[13px] font-semibold text-white leading-snug group-hover:text-ice-light transition-colors">
+              <div className="text-[13px] font-semibold text-white leading-snug group-hover:text-ice-light transition-colors line-clamp-2">
                 {article.title_en}
               </div>
               <div className="text-[10px] text-dim mt-1">
