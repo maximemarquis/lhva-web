@@ -6,11 +6,7 @@ export default async function AdminStatsPage() {
 
   const { data: goalData } = await supabase
     .from('goals')
-    .select(`
-      scorer_id, assist1_id, assist2_id,
-      scorer:players!scorer_id(id, first_name, last_name, team_id),
-      game:games(season_id)
-    `)
+    .select(`scorer_id, assist1_id, assist2_id, game:games(season_id)`)
 
   const { data: players } = await supabase
     .from('players')
@@ -18,7 +14,7 @@ export default async function AdminStatsPage() {
     .eq('is_active', true)
 
   const statsMap: Record<number, { goals: number; assists: number }> = {}
-  for (const goal of goalData ?? []) {
+  for (const goal of (goalData ?? []) as any[]) {
     if (goal.game?.season_id !== 1) continue
     if (goal.scorer_id) {
       if (!statsMap[goal.scorer_id]) statsMap[goal.scorer_id] = { goals: 0, assists: 0 }
@@ -32,7 +28,7 @@ export default async function AdminStatsPage() {
     }
   }
 
-  const stats = (players ?? [])
+  const stats = ((players ?? []) as any[])
     .map((p: any) => ({
       ...p,
       goals:   statsMap[p.id]?.goals ?? 0,
@@ -51,7 +47,6 @@ export default async function AdminStatsPage() {
           View public page ↗
         </Link>
       </div>
-
       <div className="bg-rink-800 border border-white/[0.07] rounded-lg overflow-hidden">
         <table className="w-full border-collapse">
           <thead>

@@ -15,19 +15,12 @@ interface PlayerStat {
   assists: number
   points: number
   pim: number
-  gp: number
 }
 
 async function getPlayerStats(supabase: any): Promise<PlayerStat[]> {
-  // Aggregate goals and assists per player from the goals table
   const { data: goalData } = await supabase
     .from('goals')
-    .select(`
-      scorer_id,
-      assist1_id,
-      assist2_id,
-      game:games(season_id)
-    `)
+    .select(`scorer_id, assist1_id, assist2_id, game:games(season_id)`)
 
   if (!goalData) return []
 
@@ -38,10 +31,9 @@ async function getPlayerStats(supabase: any): Promise<PlayerStat[]> {
 
   if (!players) return []
 
-  // Count stats per player
   const statsMap: Record<number, { goals: number; assists: number; pim: number }> = {}
 
-  for (const goal of goalData) {
+  for (const goal of goalData as any[]) {
     if (goal.game?.season_id !== 1) continue
     if (goal.scorer_id) {
       if (!statsMap[goal.scorer_id]) statsMap[goal.scorer_id] = { goals: 0, assists: 0, pim: 0 }
@@ -55,7 +47,7 @@ async function getPlayerStats(supabase: any): Promise<PlayerStat[]> {
     }
   }
 
-  return players
+  return (players as any[])
     .map((p: any) => ({
       player_id:    p.id,
       first_name:   p.first_name,
@@ -69,7 +61,6 @@ async function getPlayerStats(supabase: any): Promise<PlayerStat[]> {
       assists:      statsMap[p.id]?.assists ?? 0,
       points:       (statsMap[p.id]?.goals ?? 0) + (statsMap[p.id]?.assists ?? 0),
       pim:          statsMap[p.id]?.pim ?? 0,
-      gp:           0,
     }))
     .filter((p: PlayerStat) => p.points > 0 || p.goals > 0)
     .sort((a: PlayerStat, b: PlayerStat) => b.points - a.points || b.goals - a.goals)
@@ -130,19 +121,16 @@ function StatTable({ players, sortKey }: { players: PlayerStat[], sortKey: keyof
 export default async function StatsPage() {
   const supabase = await createServerSupabaseClient()
   const players = await getPlayerStats(supabase)
-
-  const scorers  = [...players].sort((a, b) => b.goals - a.goals).slice(0, 5)
-  const leaders  = [...players].sort((a, b) => b.points - a.points).slice(0, 5)
+  const scorers = [...players].sort((a, b) => b.goals - a.goals).slice(0, 5)
+  const leaders = [...players].sort((a, b) => b.points - a.points).slice(0, 5)
 
   return (
     <div className="max-w-[1000px] mx-auto px-6 py-8">
-
       <div className="mb-6">
         <div className="text-[11px] font-black uppercase tracking-widest text-ice-light mb-1">2025–26 Season</div>
         <h1 className="text-3xl font-black uppercase tracking-tight">Statistics</h1>
       </div>
 
-      {/* Leaders strip */}
       {players.length > 0 && (
         <div className="grid grid-cols-2 gap-4 mb-8">
           {[
@@ -175,13 +163,11 @@ export default async function StatsPage() {
         </div>
       )}
 
-      {/* Full table */}
       <div className="mb-3 text-[11px] font-black uppercase tracking-widest text-white flex items-center gap-2">
         <span className="w-0.5 h-3.5 bg-ice rounded-sm inline-block" />
         Skater Stats — Full Table
       </div>
       <StatTable players={players} sortKey="points" />
-
     </div>
   )
 }
