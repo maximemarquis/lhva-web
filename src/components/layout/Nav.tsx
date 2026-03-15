@@ -1,6 +1,5 @@
 'use client'
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
@@ -26,13 +25,11 @@ export function Nav() {
         {/* Logo — click to go home */}
         <Link href="/" className="flex items-center gap-3 pr-4 md:pr-7 border-r border-white/[0.07] mr-1 shrink-0 hover:opacity-85 transition-opacity">
           <div className="w-10 h-10 flex items-center justify-center shrink-0">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src="/logo.png"
               alt="LHVA Logo"
-              width={40}
-              height={40}
               className="w-10 h-10 object-contain drop-shadow-sm"
-              priority
             />
           </div>
           <div className="leading-none">
