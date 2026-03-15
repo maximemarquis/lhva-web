@@ -119,12 +119,8 @@ export function AdminSidebar({ userEmail, userName, role, open = true, onClose }
 
         {/* Logo */}
         <div className="px-4 py-4 border-b border-white/[0.07] flex items-center gap-2.5">
-          <svg viewBox="0 0 30 33" className="w-8 h-9 shrink-0">
-            <path d="M15 1L29 7V18C29 25 23 30 15 32C7 30 1 25 1 18V7L15 1Z"
-              fill="#0088ce" stroke="#00aaff" strokeWidth="0.8"/>
-            <text x="15" y="21" textAnchor="middle" fill="white"
-              fontSize="9" fontWeight="900" fontFamily="system-ui">LHVA</text>
-          </svg>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="LHVA" className="w-9 h-9 object-contain shrink-0" />
           <div className="flex-1 min-w-0">
             <div className="text-[14px] font-black">LHVA Admin</div>
             <div className="text-[10px] text-muted">2025–26 Season</div>
