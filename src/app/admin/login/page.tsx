@@ -33,12 +33,8 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="flex items-center gap-3 justify-center mb-8">
-          <svg viewBox="0 0 36 40" className="w-10 h-11">
-            <path d="M18 1L35 8V22C35 31 27 37 18 39C9 37 1 31 1 22V8L18 1Z"
-              fill="#0088ce" stroke="#00aaff" strokeWidth="0.8"/>
-            <text x="18" y="26" textAnchor="middle" fill="white"
-              fontSize="11" fontWeight="900" fontFamily="system-ui">LH</text>
-          </svg>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="LHVA" className="w-12 h-12 object-contain" />
           <div>
             <div className="text-xl font-black tracking-wide">LHVA Admin</div>
             <div className="text-[11px] text-muted">Appalachian Valley Hockey</div>
