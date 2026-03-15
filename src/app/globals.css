@@ -1,26 +1,37 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: #0d0f14;
+    color: white;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .bg-ice          { background-color: #0088ce; }
+  .bg-ice-light    { background-color: #00aaff; }
+  .bg-rink-950     { background-color: #08090b; }
+  .bg-rink-900     { background-color: #0d0f14; }
+  .bg-rink-800     { background-color: #13161e; }
+  .bg-rink-700     { background-color: #1a1e2a; }
+  .bg-rink-600     { background-color: #1e2235; }
+  .bg-rink-500     { background-color: #252a3a; }
+  .text-ice        { color: #0088ce; }
+  .text-ice-light  { color: #00aaff; }
+  .text-muted      { color: #8892a4; }
+  .text-dim        { color: #4e586a; }
+  .text-rink-900   { color: #0d0f14; }
+  .border-ice      { border-color: #0088ce; }
+  .border-ice-light{ border-color: #00aaff; }
+}
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-ticker {
+  animation: ticker 24s linear infinite;
 }
