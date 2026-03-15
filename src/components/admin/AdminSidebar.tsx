@@ -11,9 +11,8 @@ const COMMISSIONER_NAV = [
     { label: 'Activity Log', href: '/admin/activity' },
   ]},
   { section: 'Game Management', items: [
-    { label: 'Scores',       href: '/admin/scores' },
+    { label: 'Game Data',    href: '/admin/scores' },
     { label: 'Schedule',     href: '/admin/schedule' },
-    { label: 'Playoffs',     href: '/admin/playoffs' },
   ]},
   { section: 'League Data', items: [
     { label: 'Standings',    href: '/admin/standings' },

@@ -18,6 +18,7 @@ interface GameData {
   overtime: boolean
   shootout: boolean
   game_type: string
+  played_at: string
   home_team: Team
   away_team: Team
   goals: any[]
@@ -399,6 +400,8 @@ export function LiveGameSheet({ game: initialGame, playersByTeam }: Props) {
     setGame(g => ({ ...g, penalties: (g.penalties ?? []).filter((x: any) => x.id !== id) }))
   }
 
+  const isPast = new Date(game.played_at) < new Date()
+
   const periodLabel = game.current_period > 0
     ? (PERIOD_LABELS[game.current_period - 1] ?? `P${game.current_period}`)
     : '—'
@@ -415,8 +418,12 @@ export function LiveGameSheet({ game: initialGame, playersByTeam }: Props) {
       <div className="bg-rink-800 border border-white/[0.07] rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-4 py-2 bg-rink-700 border-b border-white/[0.07]">
           <div className="flex items-center gap-2">
-            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded ${statusColor[game.status] ?? ''}`}>
-              {game.status}
+            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded ${
+              game.status === 'scheduled' && isPast
+                ? 'bg-amber-500/15 text-amber-400'
+                : statusColor[game.status] ?? ''
+            }`}>
+              {game.status === 'scheduled' && isPast ? 'Score Pending' : game.status}
             </span>
             {isPending && <span className="text-[10px] text-amber-400 animate-pulse">Syncing…</span>}
           </div>
@@ -446,7 +453,7 @@ export function LiveGameSheet({ game: initialGame, playersByTeam }: Props) {
               <span className="text-5xl font-black text-white">{awayScore}</span>
             </div>
             <div className="text-[10px] text-dim mt-1 uppercase tracking-wider">
-              {game.status === 'final' ? 'Final' : game.status === 'live' ? `${periodLabel} Period` : 'Upcoming'}
+              {game.status === 'final' ? 'Final' : game.status === 'live' ? `${periodLabel} Period` : isPast ? 'Score Pending' : 'Upcoming'}
               {game.overtime && !game.shootout ? ' · OT' : ''}
               {game.shootout ? ' · SO' : ''}
             </div>
@@ -459,10 +466,16 @@ export function LiveGameSheet({ game: initialGame, playersByTeam }: Props) {
         </div>
 
         <div className="px-4 pb-4 flex flex-wrap gap-2 justify-center">
-          {game.status === 'scheduled' && (
+          {game.status === 'scheduled' && !isPast && (
             <button onClick={() => setStatus('warmup')}
               className="px-4 py-2 text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded-lg">
               Start Warmup
+            </button>
+          )}
+          {game.status === 'scheduled' && isPast && (
+            <button onClick={() => setStatus('live', 1)}
+              className="px-4 py-2 text-xs font-bold bg-ice/15 text-ice-light border border-ice/30 rounded-lg">
+              Enter Score (Retroactive)
             </button>
           )}
           {game.status === 'warmup' && (
@@ -504,7 +517,7 @@ export function LiveGameSheet({ game: initialGame, playersByTeam }: Props) {
       <PreGameSetup game={game} playersByTeam={playersByTeam} />
 
       {/* Action buttons */}
-      {game.status !== 'scheduled' && (
+      {(game.status !== 'scheduled' || isPast) && (
         <div className="grid grid-cols-2 gap-3">
           <button onClick={() => { setModal('goal'); setError(null); setGoalPeriod(String(game.current_period || 1)) }}
             className="flex items-center justify-center gap-2 bg-green-500/15 hover:bg-green-500/25 text-green-400 border border-green-500/30 rounded-xl py-4 text-[15px] font-black transition-colors">
@@ -708,7 +721,7 @@ export function LiveGameSheet({ game: initialGame, playersByTeam }: Props) {
       )}
 
       <a href="/admin/scores" className="text-[12px] font-bold text-dim hover:text-white transition-colors text-center block">
-        ← Back to Schedule
+        ← Back to Game Data
       </a>
     </div>
   )

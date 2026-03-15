@@ -75,10 +75,10 @@ export default async function ScoresPage() {
   return (
     <div className="p-6 flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-[18px] font-black">Scores</h1>
+        <h1 className="text-[18px] font-black">Game Data</h1>
         <Link href="/admin/schedule"
           className="text-[12px] font-bold text-ice-light hover:text-white transition-colors">
-          Manage Schedule →
+          Schedule & Playoffs →
         </Link>
       </div>
 
