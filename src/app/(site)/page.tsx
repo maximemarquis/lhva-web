@@ -5,6 +5,7 @@ import { LeagueLeaders } from '@/components/home/LeagueLeaders'
 import { UpcomingGames } from '@/components/home/UpcomingGames'
 import { NewsFeed } from '@/components/home/NewsFeed'
 import { LiveBanner } from '@/components/home/LiveBanner'
+import { FeaturedCarousel } from '@/components/home/FeaturedCarousel'
 import type { StandingRow, Game, Article } from '@/types'
 
 export const revalidate = 30
@@ -26,7 +27,7 @@ function SectionHeader({ title, href }: { title: string; href: string }) {
 export default async function HomePage() {
   const supabase = await createServerSupabaseClient()
 
-  const [standingsRes, recentGamesRes, upcomingGamesRes, articlesRes, liveGamesRes] = await Promise.all([
+  const [standingsRes, recentGamesRes, upcomingGamesRes, articlesRes, featuredRes, liveGamesRes] = await Promise.all([
     supabase
       .from('standings')
       .select('*')
@@ -53,6 +54,14 @@ export default async function HomePage() {
       .lte('published_at', new Date().toISOString())
       .order('published_at', { ascending: false })
       .limit(4),
+    // Featured carousel — 3 most recent published articles
+    supabase
+      .from('articles')
+      .select('*, team:teams(name_en, abbreviation, color)')
+      .eq('status', 'published')
+      .lte('published_at', new Date().toISOString())
+      .order('published_at', { ascending: false })
+      .limit(3),
     supabase
       .from('games')
       .select(`
@@ -66,16 +75,24 @@ export default async function HomePage() {
       .limit(3),
   ])
 
-  const standings    = (standingsRes.data ?? []) as StandingRow[]
-  const recentGames  = (recentGamesRes.data ?? []) as Game[]
-  const upcomingGames = (upcomingGamesRes.data ?? []) as Game[]
-  const articles     = (articlesRes.data ?? []) as Article[]
-  const liveGames    = (liveGamesRes.data ?? []) as any[]
+  const standings      = (standingsRes.data ?? [])     as StandingRow[]
+  const recentGames    = (recentGamesRes.data ?? [])    as Game[]
+  const upcomingGames  = (upcomingGamesRes.data ?? [])  as Game[]
+  const articles       = (articlesRes.data ?? [])       as Article[]
+  const featuredArticles = (featuredRes.data ?? [])     as Article[]
+  const liveGames      = (liveGamesRes.data ?? [])      as any[]
 
   return (
     <>
       {liveGames.length > 0 && <LiveBanner games={liveGames} />}
       <Hero recentGames={recentGames} />
+
+      {/* Featured Articles Carousel */}
+      {featuredArticles.length > 0 && (
+        <section className="border-b border-white/[0.07]">
+          <FeaturedCarousel articles={featuredArticles} />
+        </section>
+      )}
 
       <div className="max-w-[1200px] mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
 

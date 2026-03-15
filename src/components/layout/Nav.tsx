@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
@@ -22,21 +23,23 @@ export function Nav() {
   return (
     <nav className="bg-rink-800 border-b-[3px] border-ice sticky top-0 z-50">
       <div className="max-w-[1200px] mx-auto flex items-center h-[58px] px-4 md:px-6">
-        {/* Logo */}
-        <div className="flex items-center gap-3 pr-4 md:pr-7 border-r border-white/[0.07] mr-1 shrink-0">
-          <div className="w-9 h-10 flex items-center justify-center">
-            <svg viewBox="0 0 36 40" className="w-9 h-10">
-              <path d="M18 1L35 8V22C35 31 27 37 18 39C9 37 1 31 1 22V8L18 1Z"
-                fill="#0088ce" stroke="#00aaff" strokeWidth="0.8"/>
-              <text x="18" y="26" textAnchor="middle" fill="white"
-                fontSize="11" fontWeight="900" fontFamily="system-ui">LH</text>
-            </svg>
+        {/* Logo — click to go home */}
+        <Link href="/" className="flex items-center gap-3 pr-4 md:pr-7 border-r border-white/[0.07] mr-1 shrink-0 hover:opacity-85 transition-opacity">
+          <div className="w-10 h-10 flex items-center justify-center shrink-0">
+            <Image
+              src="/logo.png"
+              alt="LHVA Logo"
+              width={40}
+              height={40}
+              className="w-10 h-10 object-contain drop-shadow-sm"
+              priority
+            />
           </div>
           <div className="leading-none">
             <div className="text-[18px] font-black tracking-wide">LHVA</div>
             <div className="text-[10px] text-muted tracking-wide mt-0.5 hidden sm:block">Appalachian Valley Hockey</div>
           </div>
-        </div>
+        </Link>
 
         {/* Desktop Links */}
         <div className="hidden md:flex h-full">

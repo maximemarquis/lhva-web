@@ -177,6 +177,7 @@ export interface Article {
   slug: string
   body_en: string | null
   body_fr: string | null
+  cover_image_url: string | null
   category: ArticleCategory
   team_id: number | null
   status: ArticleStatus
