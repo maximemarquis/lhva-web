@@ -32,10 +32,13 @@ function GameRow({ game }: { game: Game }) {
               <span className={`text-2xl font-black ${awayWon ? 'text-white' : 'text-muted'}`}>{game.away_score}</span>
             </div>
             <div className="text-[10px] text-dim uppercase tracking-wider mt-0.5">Final{suffix}</div>
+            <div className="text-[10px] text-dim mt-0.5">
+              {new Date(game.played_at).toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Moncton' })}
+            </div>
           </>
         ) : (
           <div className="text-[13px] font-black text-ice-light">
-            {new Date(game.played_at).toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}
+            {new Date(game.played_at).toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Moncton' })}
           </div>
         )}
       </div>
@@ -69,7 +72,7 @@ export default async function SchedulePage() {
   const grouped: Record<string, Game[]> = {}
   for (const game of games) {
     const date = new Date(game.played_at).toLocaleDateString('en-CA', {
-      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Moncton'
     })
     if (!grouped[date]) grouped[date] = []
     grouped[date].push(game)

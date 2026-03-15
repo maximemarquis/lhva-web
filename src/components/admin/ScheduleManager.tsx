@@ -44,8 +44,8 @@ export function ScheduleManager({ teams, initialGames }: Props) {
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'played'>('all')
 
   const filtered = games.filter(g => {
-    if (filter === 'upcoming') return g.home_score === null
-    if (filter === 'played')   return g.home_score !== null
+    if (filter === 'upcoming') return new Date(g.played_at) >= new Date()
+    if (filter === 'played')   return new Date(g.played_at) < new Date()
     return true
   })
 
@@ -217,6 +217,11 @@ export function ScheduleManager({ teams, initialGames }: Props) {
                       <div className="text-[9px] text-dim uppercase tracking-wider">
                         {new Date(game.played_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}
                       </div>
+                      {game.home_score !== null && (
+                        <div className="text-[9px] text-dim">
+                          {new Date(game.played_at).toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}
+                        </div>
+                      )}
                     </div>
 
                     {/* Away */}
