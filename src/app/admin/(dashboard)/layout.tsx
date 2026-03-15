@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { AdminShell } from '@/components/admin/AdminShell'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createServerSupabaseClient()
@@ -22,15 +22,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // (only redirect if they somehow land on /admin root)
 
   return (
-    <div className="flex min-h-screen bg-rink-900">
-      <AdminSidebar
-        userEmail={user.email ?? ''}
-        userName={adminUser?.full_name ?? undefined}
-        role={role}
-      />
-      <div className="flex-1 flex flex-col min-w-0">
-        {children}
-      </div>
-    </div>
+    <AdminShell
+      userEmail={user.email ?? ''}
+      userName={adminUser?.full_name ?? undefined}
+      role={role}
+    >
+      {children}
+    </AdminShell>
   )
 }

@@ -144,7 +144,7 @@ export function UsersManager({ teams, initialUsers }: Props) {
           <div className="px-4 py-5 border-b border-white/[0.07] bg-rink-700/40 flex flex-col gap-4">
             <div className="text-[12px] font-black uppercase tracking-wider text-ice-light">New Admin User</div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-black uppercase tracking-widest text-dim">Email *</label>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)}
@@ -252,11 +252,11 @@ export function UsersManager({ teams, initialUsers }: Props) {
         ) : (
           users.map(user => (
             <div key={user.id}
-              className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
+              className="flex flex-wrap items-center gap-2 px-4 py-3 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
               <div className="w-8 h-8 rounded-full bg-ice flex items-center justify-center text-[11px] font-black shrink-0">
                 {(user.full_name ?? user.email).slice(0, 2).toUpperCase()}
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 mr-auto">
                 <div className="text-[13px] font-semibold text-white truncate">
                   {user.full_name ?? user.email}
                 </div>
@@ -264,28 +264,30 @@ export function UsersManager({ teams, initialUsers }: Props) {
                   <div className="text-[11px] text-dim truncate">{user.email}</div>
                 )}
               </div>
-              <select value={user.role}
-                onChange={e => handleRoleChange(user, e.target.value as AdminRole)}
-                className="bg-rink-700 border border-white/10 rounded px-2 py-1.5 text-[12px] text-white">
-                {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-              </select>
-              <select value={user.team_id ?? ''}
-                onChange={e => handleTeamChange(user, Number(e.target.value) || null)}
-                className="bg-rink-700 border border-white/10 rounded px-2 py-1.5 text-[12px] text-white">
-                <option value="">All teams</option>
-                {teams.map(t => <option key={t.id} value={t.id}>{t.abbreviation}</option>)}
-              </select>
-              <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-sm border whitespace-nowrap ${ROLE_STYLES[user.role]}`}>
-                {ROLES.find(r => r.value === user.role)?.label}
-              </span>
-              <button onClick={() => { setResetTarget(user); setNewPassword('') }}
-                className="text-[11px] font-bold text-dim hover:text-amber-400 border border-white/10 hover:border-amber-400/20 rounded px-2.5 py-1 transition-colors whitespace-nowrap">
-                Reset PW
-              </button>
-              <button onClick={() => handleDelete(user)}
-                className="text-[11px] font-bold text-dim hover:text-red-400 border border-white/10 hover:border-red-400/20 rounded px-2.5 py-1 transition-colors">
-                Remove
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <select value={user.role}
+                  onChange={e => handleRoleChange(user, e.target.value as AdminRole)}
+                  className="bg-rink-700 border border-white/10 rounded px-2 py-1.5 text-[12px] text-white">
+                  {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                </select>
+                <select value={user.team_id ?? ''}
+                  onChange={e => handleTeamChange(user, Number(e.target.value) || null)}
+                  className="bg-rink-700 border border-white/10 rounded px-2 py-1.5 text-[12px] text-white">
+                  <option value="">All teams</option>
+                  {teams.map(t => <option key={t.id} value={t.id}>{t.abbreviation}</option>)}
+                </select>
+                <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-sm border whitespace-nowrap hidden sm:inline ${ROLE_STYLES[user.role]}`}>
+                  {ROLES.find(r => r.value === user.role)?.label}
+                </span>
+                <button onClick={() => { setResetTarget(user); setNewPassword('') }}
+                  className="text-[11px] font-bold text-dim hover:text-amber-400 border border-white/10 hover:border-amber-400/20 rounded px-2.5 py-1 transition-colors whitespace-nowrap">
+                  Reset PW
+                </button>
+                <button onClick={() => handleDelete(user)}
+                  className="text-[11px] font-bold text-dim hover:text-red-400 border border-white/10 hover:border-red-400/20 rounded px-2.5 py-1 transition-colors">
+                  Remove
+                </button>
+              </div>
             </div>
           ))
         )}
